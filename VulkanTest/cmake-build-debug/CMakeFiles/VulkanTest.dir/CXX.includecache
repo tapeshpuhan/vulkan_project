@@ -1,0 +1,44 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../instance/instance.h
+GLFW/glfw3.h
+-
+memory
+-
+vulkan/vulkan.h
+-
+
+/home/tapesh/VulkanTest/instance/instance.cpp
+instance.h
+/home/tapesh/VulkanTest/instance/instance.h
+iostream
+-
+sstream
+-
+vector
+-
+optional
+-
+
+/home/tapesh/VulkanTest/instance/instance.h
+GLFW/glfw3.h
+-
+memory
+-
+vulkan/vulkan.h
+-
+
+/home/tapesh/VulkanTest/main.cpp
+instance.h
+/home/tapesh/VulkanTest/instance.h
+memory
+-
+iostream
+-
+
