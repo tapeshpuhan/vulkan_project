@@ -8,9 +8,14 @@ find_package( Threads )
 find_package(glfw3 REQUIRED)
 include_directories(${GLEW_INCLUDE_DIRS})
 include_directories(instance)
-set(instance_src instance/instance.h instance/instance.cpp)
+include_directories(window_surface)
+#add_definitions(-DVK_VERSION_1_0)
 
-add_executable(VulkanTest main.cpp ${instance_src})
+set(instance_src instance/vukan_header.h instance/instance.h instance/instance.cpp )
+set(window_surface_src window_surface/window_surface.h window_surface/window_surface.cpp )
+
+add_executable(VulkanTest main.cpp ${instance_src}
+                ${window_surface_src})
 
 #target_link_libraries (VulkanTest glfw)
 target_link_libraries (VulkanTest ${VULKAN_LIB_LIST})
