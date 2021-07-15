@@ -30,6 +30,7 @@ public:
   VkInstance getInstance()const;
   GLFWwindow* getWindow()const;
   WindowSurface* getWindowSurface()const;
+  QueueFamilyIndices getQueueFamilyIndices(VkPhysicalDevice device);
 
 private:
   void initWindow();
@@ -41,7 +42,7 @@ private:
   void createLogicalDevice();
   void createQueueHandel();
   void createPresentQueue();
-  QueueFamilyIndices getQueueFamilyIndices(VkPhysicalDevice device);
+
   bool isDeviceSuitable(VkPhysicalDevice device);
 
   GLFWwindow *m_window = nullptr;

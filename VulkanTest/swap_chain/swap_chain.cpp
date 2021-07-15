@@ -6,6 +6,7 @@
 #include "window_surface.h"
 #include <sstream>
 #include <iostream>
+#include <algorithm>
 namespace vulakn
 {
 
@@ -71,7 +72,7 @@ std::optional<VkSurfaceFormatKHR> chooseSwapSurfaceFormat(const std::vector<VkSu
   return {};
 }
 
-VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes, const SwapChainConfig& config) {
+static VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes, const SwapChainConfig& config) {
   for (const auto& availablePresentMode : availablePresentModes) {
     if (availablePresentMode == config.presentMode) {
       return availablePresentMode;
@@ -79,6 +80,35 @@ VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& avai
   }
 
   return VK_PRESENT_MODE_FIFO_KHR;
+}
+
+static VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities,CreateInstance* instance) {
+  if (capabilities.currentExtent.width != UINT32_MAX) {
+    return capabilities.currentExtent;
+  } else {
+    int width, height;
+    glfwGetFramebufferSize(instance->getWindow(), &width, &height);
+
+    VkExtent2D actualExtent = {
+        static_cast<uint32_t>(width),
+        static_cast<uint32_t>(height)
+    };
+
+    actualExtent.width = std::clamp(actualExtent.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
+    actualExtent.height = std::clamp(actualExtent.height, capabilities.minImageExtent.height, capabilities.maxImageExtent.height);
+
+    return actualExtent;
+  }
+}
+
+static uint32_t getImageCount(const VkSurfaceCapabilitiesKHR& capabilities)
+{
+  uint32_t imageCount = capabilities.minImageCount + 1;
+  if (capabilities.maxImageCount > 0 && imageCount > capabilities.maxImageCount) {
+    imageCount = capabilities.maxImageCount;
+  }
+
+  return imageCount;
 }
 
 SwapChain::SwapChain(CreateInstance* instance):m_instance{instance}
@@ -100,8 +130,47 @@ void SwapChain::create()
     throw std::runtime_error("swap chain format is not supported");
 
   auto presentMode = chooseSwapPresentMode(swapChainSupport.presentModes,m_config);
+  auto swapExtent = chooseSwapExtent(swapChainSupport.capabilities, m_instance);
+  auto imageCount = getImageCount(swapChainSupport.capabilities);
 
+  VkSwapchainCreateInfoKHR createInfo{};
+  createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+  createInfo.surface = m_instance->getWindowSurface()->getSurface();
 
+  createInfo.minImageCount = imageCount;
+  createInfo.imageFormat = format.value().format;
+  createInfo.imageColorSpace = format.value().colorSpace;
+  createInfo.imageExtent = swapExtent;
+  createInfo.imageArrayLayers = m_config.imageArrayLayers;
+  createInfo.imageUsage = m_config.imageUsage;
+
+  auto indices = m_instance->getQueueFamilyIndices(m_instance->getPhysicalDevice());
+  uint32_t queueFamilyIndices[] = {indices.graphicsFamily.value(), indices.presentFamily.value()};
+
+  if (indices.graphicsFamily != indices.presentFamily) {
+    createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
+    createInfo.queueFamilyIndexCount = 2;
+    createInfo.pQueueFamilyIndices = queueFamilyIndices;
+  } else {
+    createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+  }
+
+  createInfo.preTransform = swapChainSupport.capabilities.currentTransform;
+  createInfo.compositeAlpha = m_config.compositeAlphaFlagBits;
+  createInfo.presentMode = presentMode;
+  createInfo.clipped = VK_TRUE;
+
+  createInfo.oldSwapchain = VK_NULL_HANDLE;
+  if (vkCreateSwapchainKHR(m_instance->getDevice(), &createInfo, nullptr, &m_swapChain) != VK_SUCCESS) {
+    throw std::runtime_error("failed to create swap chain!");
+  }
+
+  vkGetSwapchainImagesKHR(m_instance->getDevice(), m_swapChain, &imageCount, nullptr);
+  m_swapChainImages.resize(imageCount);
+  vkGetSwapchainImagesKHR(m_instance->getDevice(), m_swapChain, &imageCount, m_swapChainImages.data());
+
+  m_swapChainImageFormat = format->format;
+  m_swapChainExtent = swapExtent;
 }
 
 }
