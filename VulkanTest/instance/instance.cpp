@@ -6,7 +6,8 @@
 #include <sstream>
 #include <vector>
 #include <set>
-
+#include "swap_chain.h"
+#include "window_surface.h"
 namespace vulakn {
 
 constexpr uint32_t c_Width{800};
@@ -79,7 +80,7 @@ bool CreateInstance::isDeviceSuitable(VkPhysicalDevice device)
 }
 
 // CreateInstance
-CreateInstance::CreateInstance():m_windowSurface{std::make_shared<WindowSurface>(this)} {}
+CreateInstance::CreateInstance():m_windowSurface{std::make_shared<WindowSurface>(this)},m_swapChain{std::make_shared<SwapChain>(this)} {}
 
 CreateInstance::~CreateInstance() { cleanup(); }
 
@@ -153,6 +154,7 @@ void CreateInstance::initVulkan() {
   createLogicalDevice();
   createQueueHandel();
   createPresentQueue();
+  m_swapChain->create();
 }
 
 void CreateInstance::mainLoop() {
@@ -249,6 +251,11 @@ VkDevice CreateInstance::getDevice() const
   return m_logicalDevice;
 }
 
+VkPhysicalDevice CreateInstance::getPhysicalDevice() const
+{
+  return m_physicalDevice;
+}
+
 VkQueue CreateInstance::getGraphicsQueue() const
 {
   return m_graphicsQueue;
@@ -262,6 +269,11 @@ VkInstance CreateInstance::getInstance()const
 GLFWwindow* CreateInstance::getWindow()const
 {
   return m_window;
+}
+
+WindowSurface* CreateInstance::getWindowSurface()const
+{
+  return m_windowSurface.get();
 }
 
 QueueFamilyIndices CreateInstance::getQueueFamilyIndices(VkPhysicalDevice device)
