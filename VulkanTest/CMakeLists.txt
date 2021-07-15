@@ -9,12 +9,13 @@ find_package(glfw3 REQUIRED)
 include_directories(${GLEW_INCLUDE_DIRS})
 include_directories(instance)
 include_directories(window_surface)
-#add_definitions(-DVK_VERSION_1_0)
+include_directories(swap_chain)
 
 set(instance_src instance/vukan_header.h instance/instance.h instance/instance.cpp )
 set(window_surface_src window_surface/window_surface.h window_surface/window_surface.cpp )
-
+set(swap_chain_src swap_chain/swap_chain.h swap_chain/swap_chain.cpp)
 add_executable(VulkanTest main.cpp ${instance_src}
+                ${swap_chain_src}
                 ${window_surface_src})
 
 #target_link_libraries (VulkanTest glfw)

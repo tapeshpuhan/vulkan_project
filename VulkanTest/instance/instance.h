@@ -1,6 +1,5 @@
 #pragma once
 #include "vukan_header.h"
-#include "window_surface.h"
 #include <memory>
 #include <optional>
 namespace vulakn {
@@ -13,6 +12,9 @@ struct QueueFamilyIndices
   void printInfo();
 };
 
+class WindowSurface;
+class SwapChain;
+
 class CreateInstance {
 public:
 
@@ -23,9 +25,11 @@ public:
   void run();
 
   VkDevice getDevice() const;
+  VkPhysicalDevice getPhysicalDevice() const;
   VkQueue getGraphicsQueue() const;
   VkInstance getInstance()const;
   GLFWwindow* getWindow()const;
+  WindowSurface* getWindowSurface()const;
 
 private:
   void initWindow();
@@ -48,6 +52,7 @@ private:
   VkQueue m_presentQueue;
 
   std::shared_ptr<WindowSurface> m_windowSurface;
+  std::shared_ptr<SwapChain> m_swapChain;
 };
 
 } // namespace vulakn
