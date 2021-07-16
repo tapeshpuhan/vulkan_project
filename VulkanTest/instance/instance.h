@@ -42,11 +42,13 @@ private:
   void createLogicalDevice();
   void createQueueHandel();
   void createPresentQueue();
+  void setupDebugMessenger();
 
   bool isDeviceSuitable(VkPhysicalDevice device);
 
   GLFWwindow *m_window = nullptr;
   VkInstance m_instance;
+  VkDebugUtilsMessengerEXT m_debugMessenger;
   VkPhysicalDevice m_physicalDevice = VK_NULL_HANDLE;
   VkDevice m_logicalDevice;
   VkQueue m_graphicsQueue;
