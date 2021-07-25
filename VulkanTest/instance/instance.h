@@ -14,6 +14,7 @@ struct QueueFamilyIndices
 
 class WindowSurface;
 class SwapChain;
+class ImageViews;
 
 class CreateInstance {
 public:
@@ -31,6 +32,7 @@ public:
   GLFWwindow* getWindow()const;
   WindowSurface* getWindowSurface()const;
   QueueFamilyIndices getQueueFamilyIndices(VkPhysicalDevice device);
+  SwapChain* getSwapChain()const;
 
 private:
   void initWindow();
@@ -56,6 +58,7 @@ private:
 
   std::shared_ptr<WindowSurface> m_windowSurface;
   std::shared_ptr<SwapChain> m_swapChain;
+  std::shared_ptr<ImageViews> m_imageViews;
 };
 
 } // namespace vulakn

@@ -173,4 +173,23 @@ void SwapChain::create()
   m_swapChainExtent = swapExtent;
 }
 
+const std::vector<VkImage> SwapChain::getSwapChainImages()const
+{
+  return m_swapChainImages;
+}
+
+const VkFormat SwapChain::getSwapChainFormat()const
+{
+  return m_swapChainImageFormat;
+}
+
+const VkExtent2D SwapChain::getSwapChainExtent()const
+{
+  return m_swapChainExtent;
+}
+
+void SwapChain::clean()
+{
+  vkDestroySwapchainKHR(m_instance->getDevice(), m_swapChain, nullptr);
+}
 }

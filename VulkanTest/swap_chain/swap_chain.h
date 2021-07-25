@@ -29,7 +29,10 @@ public:
   explicit SwapChain(CreateInstance* instance);
   explicit SwapChain(CreateInstance* instance,const SwapChainConfig& config);
   void create();
-
+  void clean();
+  const std::vector<VkImage> getSwapChainImages()const;
+  const VkFormat getSwapChainFormat()const;
+  const VkExtent2D getSwapChainExtent()const;
 private:
 
   CreateInstance* m_instance;

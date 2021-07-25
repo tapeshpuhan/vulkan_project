@@ -8,6 +8,7 @@
 #include <set>
 #include "swap_chain.h"
 #include "window_surface.h"
+#include "image_view.h"
 namespace vulakn {
 
 #ifdef NDEBUG
@@ -128,7 +129,9 @@ bool CreateInstance::isDeviceSuitable(VkPhysicalDevice device)
 }
 
 // CreateInstance
-CreateInstance::CreateInstance():m_windowSurface{std::make_shared<WindowSurface>(this)},m_swapChain{std::make_shared<SwapChain>(this)} {}
+CreateInstance::CreateInstance():m_windowSurface{std::make_shared<WindowSurface>(this)},
+                                   m_swapChain{std::make_shared<SwapChain>(this)},
+                                   m_imageViews{std::make_shared<ImageViews>(this)}{}
 
 CreateInstance::~CreateInstance() { cleanup(); }
 
@@ -204,6 +207,7 @@ void CreateInstance::initVulkan() {
   createQueueHandel();
   createPresentQueue();
   m_swapChain->create();
+  m_imageViews->create();
 }
 
 void CreateInstance::mainLoop() {
@@ -215,6 +219,8 @@ void CreateInstance::mainLoop() {
 void CreateInstance::cleanup() {
 
   if (m_window != nullptr) {
+    m_imageViews->clean();
+    m_swapChain->clean();
     m_windowSurface->clean();
     vkDestroyDevice(m_logicalDevice, nullptr);
     vkDestroyInstance(m_instance, nullptr);
@@ -366,6 +372,11 @@ void CreateInstance::createPresentQueue()
   QueueFamilyIndices indices = getQueueFamilyIndices(m_physicalDevice);
 
   vkGetDeviceQueue(m_logicalDevice, indices.presentFamily.value(), 0, &m_presentQueue);
+}
+
+SwapChain* CreateInstance::getSwapChain()const
+{
+  return m_swapChain.get();
 }
 
 } // namespace vulakn
